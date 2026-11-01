@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, type FormEvent } from "react"
 import Link from "next/link"
 import { toast } from "react-hot-toast"
 import { Form } from "@heroui/react"
@@ -12,11 +12,21 @@ import {
   MailIcon,
   UserIcon,
 } from "lucide-react"
-import {signIn, signUp, useSession} from "../../../lib/auth-client"
+import { signIn, signUp, useSession } from "../../../lib/auth-client"
 import { redirect } from "next/navigation"
 
+// Local type: only used in this page.
+type RegisterFormData = {
+  name: string
+  email: string
+  photoURL: string
+  password: string
+  // The form collects `photoURL`, but the submit handler below reads `image`.
+  // Kept optional so the original behaviour is preserved.
+  image?: string
+}
 
-const validatePassword = (password) => {
+const validatePassword = (password: string): string | null => {
   if (!/[A-Z]/.test(password)) {
     return "Password must contain at least one uppercase letter"
   }
@@ -34,18 +44,20 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
 
   //protected for valied user
-  const {data: session} = useSession();
+  const { data: session } = useSession()
   console.log(session, "session")
-  if(session?.user){
-    redirect("/");
+  if (session?.user) {
+    redirect("/")
   }
 
   // Collects all form data into a plain object
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const formData = new FormData(event.currentTarget)
-    const data = Object.fromEntries(formData.entries())
+    const data = Object.fromEntries(
+      formData.entries()
+    ) as unknown as RegisterFormData
 
     if (!data.name || !data.email || !data.photoURL || !data.password) {
       toast.error("Please fill in all fields")
@@ -61,30 +73,29 @@ export default function RegisterPage() {
 
     // send data to better auth for sign up
     setLoading(true)
-    const {data:successData, error} = await signUp.email({
-      name: data.name,
-      email: data.email,
-      password: data.password,
+    const { data: successData, error } = await signUp.email({
+      name: data.name.trim(),
+      email: data.email.trim(),
+      password: data.password.trim(),
       image: data.image,
-      callbackURL: '/',
-    }) 
+      callbackURL: "/",
+    })
     setLoading(false)
 
-    console.log(successData);
-    console.log(error);
+    console.log(successData)
+    console.log(error)
 
-    if(successData?.user){
+    if (successData?.user) {
       toast.success("Registration successful!")
-      redirect("/");
+      redirect("/")
     } else {
-      toast.error(`${error.message}`)
+      toast.error(`${error?.message}`)
     }
-
   }
 
-  const handleGoogleLogin = async() => {
+  const handleGoogleLogin = async () => {
     // Google sign-in will be wired up later
-    const {error} = await signIn.social({
+    const { error } = await signIn.social({
       provider: "google",
     })
 
@@ -105,7 +116,7 @@ export default function RegisterPage() {
           Sign up to start managing events
         </p>
 
-        <Form onSubmit={handleSubmit} className="mt-6 space-y-5" noValidate>
+        <Form onSubmit={handleSubmit} className="mt-6 space-y-5">
           <div>
             <label
               htmlFor="name"
@@ -134,7 +145,7 @@ export default function RegisterPage() {
               Email
             </label>
             <div className="relative">
-              <MailIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-400" />
+              <MailIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-400 dark:text-neutral-100" />
               <input
                 id="email"
                 name="email"

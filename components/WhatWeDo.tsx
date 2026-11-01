@@ -1,6 +1,18 @@
-import { CalendarPlusIcon, HeartHandshakeIcon, UsersIcon } from "lucide-react"
+import {
+  CalendarPlusIcon,
+  HeartHandshakeIcon,
+  UsersIcon,
+  type LucideIcon,
+} from "lucide-react"
 
-const cards = [
+// Local type: only used in this component.
+type WhatWeDoCard = {
+  icon: LucideIcon
+  title: string
+  desc: string
+}
+
+const cards: WhatWeDoCard[] = [
   {
     icon: CalendarPlusIcon,
     title: "Create Events",
@@ -22,12 +34,12 @@ export default function WhatWeDo() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
       <div className="mb-10 text-center">
-        <h2 className="text-3xl font-bold text-neutral-900 dark:text-neutral-50 max-sm:text-2xl">
+        <h2 className="text-3xl font-bold text-neutral-900 max-sm:text-2xl dark:text-neutral-50">
           What We Do
         </h2>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3 max-lg:grid-cols-2 max-sm:grid-cols-1">
+      <div className="grid gap-6 max-lg:grid-cols-2 max-sm:grid-cols-1 lg:grid-cols-3">
         {cards.map(({ icon: Icon, title, desc }) => (
           <div
             key={title}

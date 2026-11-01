@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, type FormEvent } from "react"
 import Link from "next/link"
 import { toast } from "react-hot-toast"
 import { Form } from "@heroui/react"
@@ -8,45 +8,51 @@ import { EyeIcon, EyeOffIcon, LockIcon, MailIcon } from "lucide-react"
 import { signIn, useSession } from "../../../lib/auth-client"
 import { redirect } from "next/navigation"
 
+// Local type: only used in this page.
+type LoginFormData = {
+  email: string
+  password: string
+}
+
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
   // protected for valied user
-  const {data:session} = useSession();
+  const { data: session } = useSession()
   console.log(session, "session")
-  if(session?.user){
-    redirect("/");
+  if (session?.user) {
+    redirect("/")
   }
 
   // Collects all form data into a plain object
-  const handleSubmit = async(event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const formData = new FormData(event.currentTarget)
-    const data = Object.fromEntries(formData.entries())
+    const data = Object.fromEntries(
+      formData.entries()
+    ) as unknown as LoginFormData
 
     if (!data.email || !data.password) {
       toast.error("Please fill in all fields")
       return
     }
 
-
     // send data for login
     setLoading(true)
-    const {data:signInData, error} = await signIn.email({
-      email: data.email,
-      password: data.password
+    const { data: signInData, error } = await signIn.email({
+      email: data.email.trim(),
+      password: data.password.trim(),
     })
     setLoading(false)
 
-    if(signInData?.user){
-      toast.success("Logged in successfully!");
+    if (signInData?.user) {
+      toast.success("Logged in successfully!")
       redirect("/")
     } else {
-      toast.error( `${error.message}`);
+      toast.error(`${error?.message}`)
     }
-
   }
 
   const handleGoogleLogin = async () => {
@@ -72,7 +78,7 @@ export default function LoginPage() {
           Log in to manage your events
         </p>
 
-        <Form onSubmit={handleSubmit} className="mt-6 space-y-5" noValidate>
+        <Form onSubmit={handleSubmit} className="mt-6 space-y-5">
           <div>
             <label
               htmlFor="email"

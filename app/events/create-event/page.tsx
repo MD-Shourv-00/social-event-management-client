@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, type FormEvent } from "react"
 import {
   Dialog,
   DialogContent,
@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import type { EventFormData } from "@/app/type/type"
 
 const eventTypes = [
   "Cleanup",
@@ -21,14 +22,14 @@ const eventTypes = [
 
 export default function CreateEventPage() {
   const [open, setOpen] = useState(false)
-  const [preview, setPreview] = useState(null)
+  const [preview, setPreview] = useState<EventFormData | null>(null)
 
   // Collects all form data into a plain object, then opens the dialog
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const formData = new FormData(event.currentTarget)
-    const data = Object.fromEntries(formData.entries())
+    const data = Object.fromEntries(formData.entries()) as EventFormData
 
     setPreview(data)
     setOpen(true)
@@ -37,7 +38,7 @@ export default function CreateEventPage() {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
       {/* Top-left CTA text */}
-      <h1 className="mb-8 text-3xl font-extrabold text-neutral-900 dark:text-neutral-50 max-sm:text-2xl">
+      <h1 className="mb-8 text-3xl font-extrabold text-neutral-900 max-sm:text-2xl dark:text-neutral-50">
         Create Event to help people
       </h1>
 
@@ -59,7 +60,7 @@ export default function CreateEventPage() {
             name="title"
             type="text"
             placeholder="Event title"
-            className="rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
+            className="rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 transition outline-none focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
           />
         </div>
 
@@ -76,7 +77,7 @@ export default function CreateEventPage() {
             name="description"
             rows={4}
             placeholder="What is this event about?"
-            className="resize-y rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
+            className="resize-y rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 transition outline-none focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
           />
         </div>
 
@@ -93,7 +94,7 @@ export default function CreateEventPage() {
               id="eventType"
               name="eventType"
               defaultValue=""
-              className="rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
+              className="rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 transition outline-none focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
             >
               <option value="" disabled>
                 Select event type
@@ -118,7 +119,7 @@ export default function CreateEventPage() {
               name="thumbnail"
               type="url"
               placeholder="https://example.com/image.jpg"
-              className="rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
+              className="rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 transition outline-none focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
             />
           </div>
         </div>
@@ -137,7 +138,7 @@ export default function CreateEventPage() {
               name="location"
               type="text"
               placeholder="Event location"
-              className="rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
+              className="rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 transition outline-none focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
             />
           </div>
 
@@ -152,7 +153,7 @@ export default function CreateEventPage() {
               id="eventDate"
               name="eventDate"
               type="date"
-              className="rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
+              className="rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 transition outline-none focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
             />
           </div>
         </div>

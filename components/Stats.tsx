@@ -1,4 +1,10 @@
-const stats = [
+// Local type: only used in this component.
+type Stat = {
+  value: string
+  label: string
+}
+
+const stats: Stat[] = [
   { value: "120+", label: "Events Created" },
   { value: "4,500+", label: "People Joined" },
   { value: "30+", label: "Cities Reached" },

@@ -13,11 +13,12 @@ import {
 } from "@/components/ui/popover"
 import { LogOutIcon, UserIcon } from "lucide-react"
 import Image from "next/image"
+import type { NavLink } from "@/app/type/type"
 
-const menuLinks = [
-  { href: "/create-event", label: "Create Event" },
-  { href: "/manage-events", label: "Manage Event" },
-  { href: "/joined-events", label: "Joined Event" },
+const menuLinks: NavLink[] = [
+  { href: "/events/create-event", label: "Create Event" },
+  { href: "/events/manage-events", label: "Manage Event" },
+  { href: "/events/joined-events", label: "Joined Event" },
 ]
 
 export default function Navbar() {
@@ -36,7 +37,7 @@ export default function Navbar() {
             height={9}
             className="h-9 w-9 rounded-full object-cover"
           />
-          <span className="font-semibold text-neutral-900 dark:text-neutral-50 max-sm:hidden">
+          <span className="font-semibold text-neutral-900 max-sm:hidden dark:text-neutral-50">
             SocialEvent
           </span>
         </Link>
@@ -44,7 +45,7 @@ export default function Navbar() {
         {/* Middle: upcoming event link */}
         <Link
           href="/events"
-          className="text-sm font-medium text-neutral-600 transition-colors hover:text-[#26AE60] dark:text-neutral-300 "
+          className="text-sm font-medium text-neutral-600 transition-colors hover:text-[#26AE60] dark:text-neutral-300"
         >
           Upcoming Event
         </Link>
@@ -111,7 +112,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => signOut()}
-                className="hidden rounded-lg border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 transition-colors hover:border-[#FB8072] hover:text-[#FB8072] dark:border-neutral-700 dark:text-neutral-200 sm:block"
+                className="hidden rounded-lg border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 transition-colors hover:border-[#FB8072] hover:text-[#FB8072] sm:block dark:border-neutral-700 dark:text-neutral-200"
               >
                 Sign Out
               </button>

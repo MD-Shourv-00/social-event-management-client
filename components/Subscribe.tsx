@@ -2,7 +2,7 @@ export default function Subscribe() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-xl text-center">
-        <h2 className="text-3xl font-bold text-neutral-900 dark:text-neutral-50 max-sm:text-2xl">
+        <h2 className="text-3xl font-bold text-neutral-900 max-sm:text-2xl dark:text-neutral-50">
           Subscribe Us
         </h2>
         <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
