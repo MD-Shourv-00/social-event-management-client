@@ -17,8 +17,8 @@ import type { NavLink } from "@/app/type/type"
 
 const menuLinks: NavLink[] = [
   { href: "/events/create-event", label: "Create Event" },
-  { href: "/events/manage-events", label: "Manage Event" },
-  { href: "/events/joined-events", label: "Joined Event" },
+  { href: "/events/manage-event", label: "Manage Event" },
+  { href: "/events/joined-event", label: "Joined Event" },
 ]
 
 export default function Navbar() {
@@ -44,7 +44,7 @@ export default function Navbar() {
 
         {/* Middle: upcoming event link */}
         <Link
-          href="/events"
+          href="/events/upcoming-events"
           className="text-sm font-medium text-neutral-600 transition-colors hover:text-[#26AE60] dark:text-neutral-300"
         >
           Upcoming Event

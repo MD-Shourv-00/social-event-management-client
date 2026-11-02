@@ -20,7 +20,7 @@ export default function Hero() {
           create event , join event , help people as much you can.
         </p>
         <Link
-          href="/events"
+          href="/events/upcoming-events"
           className="mt-2 rounded-lg bg-[#26AE60] px-8 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
         >
           Join Event Now

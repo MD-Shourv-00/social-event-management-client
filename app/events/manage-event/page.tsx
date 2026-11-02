@@ -10,13 +10,13 @@ const ManageEventsPage = async () => {
     })
 
     console.log("session",session)
-
+// fetch data
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}`
   )
-  const eventsData:   EventFormData = await res.json() || [];
+  const eventsData:   EventFormData[] = await res.json() || [];
 
-  // console.log(eventsData);
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8">
