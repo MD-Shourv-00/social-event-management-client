@@ -9,6 +9,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import type { EventFormData } from "@/app/type/type"
+import { useSession } from "@/lib/auth-client"
+import { redirect } from "next/navigation"
+import toast from "react-hot-toast"
 
 const eventTypes = [
   "Cleanup",
@@ -23,9 +26,15 @@ const eventTypes = [
 export default function CreateEventPage() {
   const [open, setOpen] = useState(false)
   const [preview, setPreview] = useState<EventFormData | null>(null)
+  const [loading, setLoading] = useState(false);
+
+  //user session
+  const {data: session} = useSession();
+
+
 
   // Collects all form data into a plain object, then opens the dialog
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const formData = new FormData(event.currentTarget)
@@ -33,6 +42,35 @@ export default function CreateEventPage() {
 
     setPreview(data)
     setOpen(true)
+
+  }
+
+  const handleConfirmBtn = async () => {
+    // post mehtod use
+      setLoading(true);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(preview),
+        }
+      )
+      setLoading(false);
+
+      const response = await res.json();
+      console.log(response);
+
+      if(response.acknowledged) {
+        setOpen(false);
+        toast.success("You Successfully create a new Event!")
+        redirect("/events/manage-event");
+        
+      } else{
+        toast.error("Event Not Created! Try again (: ")
+      }
   }
 
   return (
@@ -94,7 +132,7 @@ export default function CreateEventPage() {
               id="eventType"
               name="eventType"
               defaultValue=""
-              className="rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 transition outline-none focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
+              className="rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 transition outline-none focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:bg-[#121212] dark:text-neutral-300"
             >
               <option value="" disabled>
                 Select event type
@@ -242,6 +280,8 @@ export default function CreateEventPage() {
             </button>
             <button
               type="button"
+              disabled={loading}
+              onClick={handleConfirmBtn}
               className="rounded-lg bg-[#26AE60] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
               Confirm

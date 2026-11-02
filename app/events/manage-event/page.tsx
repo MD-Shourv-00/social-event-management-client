@@ -1,0 +1,44 @@
+import ManageEventCard from "@/components/ManageEventCard"
+import type { EventFormData } from "@/app/type/type"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
+
+
+const ManageEventsPage = async () => {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
+
+    console.log("session",session)
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}`
+  )
+  const eventsData:   EventFormData = await res.json() || [];
+
+  // console.log(eventsData);
+  return (
+    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-extrabold text-neutral-900 max-sm:text-2xl dark:text-neutral-50">
+          Manage Events
+        </h1>
+        <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+          View, edit, and remove the events you&apos;ve created.
+        </p>
+      </div>
+
+      {eventsData.length === 0 ? (
+        <div className="flex justify-center items-center border border-dashed rounded-[10px] text-slate-400 border-slate-400 h-75 text-2xl"> No Event Created </div>  
+      ) : (
+        <div className="grid grid-cols-3 gap-6 max-lg:grid-cols-2 max-md:grid-cols-1 max-sm:grid-cols-1">
+          {eventsData.map((event) => (
+            <ManageEventCard key={event.title} event={event} />
+          ))}
+        </div>
+      )}
+    </main>
+  )
+}
+
+export default ManageEventsPage
