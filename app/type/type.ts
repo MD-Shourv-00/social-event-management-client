@@ -16,6 +16,7 @@ export type EventType =
 
 /* Data collected from the Create Event form. */
 export type EventFormData = {
+  _id: string
   title: string
   description: string
   eventType: EventType

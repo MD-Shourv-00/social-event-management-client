@@ -4,7 +4,7 @@ import type { NavLink } from "@/app/type/type"
 
 const quickLinks: NavLink[] = [
   { href: "/", label: "Home" },
-  { href: "/events", label: "Events" },
+  { href: "/events/upcoming-events", label: "Events" },
   { href: "/login", label: "Login" },
   { href: "/register", label: "Register" },
 ]

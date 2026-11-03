@@ -19,6 +19,7 @@ import { Trash2 } from "lucide-react"
 import { useState } from "react"
 import { useSession } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
+import EditEventDialog from "./EditEventDialog"
 
 type ManageEventCardProps = {
   event: EventFormData
@@ -29,10 +30,9 @@ export default function ManageEventCard({ event }: ManageEventCardProps) {
   const router = useRouter();
   const {data: session} = useSession()
   
-
   const handleConfirmDelete = async () => {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}`,
+      `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}_${event._id}`,
       {
         method: "DELETE",
       }
@@ -40,7 +40,7 @@ export default function ManageEventCard({ event }: ManageEventCardProps) {
 
     const response = await res.json()
     console.log(response, "after delete")
-    if (response.deleteCount > 0) toast.success("You delete an Event");
+    if (response.deletedCount > 0) toast.success("You deleted an Event")
 
     setOpen(false);
     router.refresh();
@@ -85,12 +85,7 @@ export default function ManageEventCard({ event }: ManageEventCardProps) {
 
         {/* Action buttons — no functionality yet */}
         <div className="mt-auto flex gap-3 pt-1">
-          <button
-            type="button"
-            className="flex-1 cursor-pointer rounded-lg border border-neutral-300 px-4 py-2 text-sm font-semibold text-neutral-700 transition-colors hover:border-[#26AE60] hover:text-[#26AE60] dark:border-neutral-700 dark:text-neutral-200"
-          >
-            Edit
-          </button>
+          <EditEventDialog/>
           <button
             type="button"
             onClick={() => {
@@ -141,6 +136,7 @@ export default function ManageEventCard({ event }: ManageEventCardProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </article>
   )
 }

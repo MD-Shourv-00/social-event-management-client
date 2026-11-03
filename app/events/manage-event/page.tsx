@@ -12,7 +12,9 @@ const ManageEventsPage = async () => {
     console.log("session",session)
 // fetch data
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}`
+    `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}`,{
+      cache: 'no-store'
+    }
   )
   const eventsData:   EventFormData[] = await res.json() || [];
 
