@@ -26,12 +26,10 @@ const eventTypes = [
 export default function CreateEventPage() {
   const [open, setOpen] = useState(false)
   const [preview, setPreview] = useState<EventFormData | null>(null)
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   //user session
-  const {data: session} = useSession();
-
-
+  const { data: session } = useSession()
 
   // Collects all form data into a plain object, then opens the dialog
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -42,35 +40,33 @@ export default function CreateEventPage() {
 
     setPreview(data)
     setOpen(true)
-
   }
 
   const handleConfirmBtn = async () => {
     // post mehtod use
-      setLoading(true);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(preview),
-        }
-      )
-      setLoading(false);
-
-      const response = await res.json();
-      console.log(response);
-
-      if(response.acknowledged) {
-        setOpen(false);
-        toast.success("You Successfully create a new Event!")
-        redirect("/events/manage-event");
-        
-      } else{
-        toast.error("Event Not Created! Try again (: ")
+    setLoading(true)
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(preview),
       }
+    )
+    setLoading(false)
+
+    const response = await res.json()
+    console.log(response)
+
+    if (response.acknowledged) {
+      setOpen(false)
+      toast.success("You Successfully create a new Event!")
+      redirect("/events/manage-event")
+    } else {
+      toast.error("Event Not Created! Try again (: ")
+    }
   }
 
   return (
@@ -94,6 +90,7 @@ export default function CreateEventPage() {
             Title
           </label>
           <input
+            required
             id="title"
             name="title"
             type="text"
@@ -153,6 +150,7 @@ export default function CreateEventPage() {
               Thumbnail Image URL
             </label>
             <input
+              required
               id="thumbnail"
               name="thumbnail"
               type="url"
@@ -172,6 +170,7 @@ export default function CreateEventPage() {
               Location
             </label>
             <input
+              required
               id="location"
               name="location"
               type="text"
@@ -188,6 +187,7 @@ export default function CreateEventPage() {
               Event Date
             </label>
             <input
+              required
               id="eventDate"
               name="eventDate"
               type="date"
@@ -200,13 +200,13 @@ export default function CreateEventPage() {
         <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:justify-end">
           <button
             type="reset"
-            className="rounded-lg border border-neutral-300 px-6 py-2.5 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+            className="cursor-pointer rounded-lg border border-neutral-300 px-6 py-2.5 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
           >
             Reset
           </button>
           <button
             type="submit"
-            className="rounded-lg bg-[#26AE60] px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="cursor-pointer rounded-lg bg-[#26AE60] px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
           >
             Create
           </button>
@@ -274,7 +274,7 @@ export default function CreateEventPage() {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="rounded-lg border border-neutral-300 px-5 py-2.5 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+              className="cursor-pointer rounded-lg border border-neutral-300 px-5 py-2.5 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
             >
               Edit
             </button>
@@ -282,7 +282,7 @@ export default function CreateEventPage() {
               type="button"
               disabled={loading}
               onClick={handleConfirmBtn}
-              className="rounded-lg bg-[#26AE60] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="cursor-pointer rounded-lg bg-[#26AE60] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
               Confirm
             </button>

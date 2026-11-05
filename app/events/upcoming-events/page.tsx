@@ -1,36 +1,14 @@
 import EventCard from "@/components/EventCard"
 import type { EventFormData } from "@/app/type/type"
 
-// Static sample data — replace with dynamic data later.
-const upcomingEvents: EventFormData[] = [
-  {
-    title: "adfadf",
-    description: "adfsdfa",
-    eventType: "Plantation",
-    thumbnail:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxag1V-J6EsRsWp3TiGodGPGPuiRp5a_RKRp3P5ChZbA&s=10",
-    location: "afafaf",
-    eventDate: "2026-11-01",
-  },
-  {
-    title: "Beach Cleanup Drive",
-    description: "Join us for a morning of cleaning up the shoreline.",
-    eventType: "Cleanup",
-    thumbnail: "/banner.webp",
-    location: "Cox's Bazar Beach",
-    eventDate: "2026-11-15",
-  },
-  {
-    title: "Winter Donation Campaign",
-    description: "Donate warm clothes to families in need this winter.",
-    eventType: "Donation",
-    thumbnail: "/random.jpeg",
-    location: "Old Town Community Center",
-    eventDate: "2026-12-05",
-  },
-]
 
-const UpcomingEventPage = () => {
+const UpcomingEventPage = async() => {
+  const res = await fetch("http://localhost:5000/all-future-event",{
+    cache: "no-store"
+  })
+
+  const upcomingEvents: EventFormData[] = await res.json()
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8">

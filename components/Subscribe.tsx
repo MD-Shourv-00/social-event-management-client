@@ -17,7 +17,7 @@ export default function Subscribe() {
           />
           <button
             type="button"
-            className="rounded-lg bg-[#26AE60] px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="cursor-pointer rounded-lg bg-[#26AE60] px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
           >
             Subscribe
           </button>

@@ -23,4 +23,6 @@ export type EventFormData = {
   thumbnail: string
   location: string
   eventDate: string
+  email: string
+  eventId: string
 }

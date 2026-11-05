@@ -120,7 +120,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
-                className="absolute top-1/2 right-3 -translate-y-1/2 text-neutral-400 transition hover:text-neutral-600 dark:hover:text-neutral-200"
+                className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-neutral-400 transition hover:text-neutral-600 dark:hover:text-neutral-200"
               >
                 {showPassword ? (
                   <EyeOffIcon className="size-4" />
@@ -136,7 +136,7 @@ export default function LoginPage() {
               type="submit"
               disabled={loading}
               style={{ backgroundColor: "#26AE60" }}
-              className="w-full rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="w-full cursor-pointer rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
               Login
             </button>
@@ -145,7 +145,7 @@ export default function LoginPage() {
               type="button"
               onClick={handleGoogleLogin}
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-300 py-2.5 text-sm font-medium text-neutral-700 transition-opacity hover:opacity-80 dark:border-neutral-700 dark:text-neutral-200"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-neutral-300 py-2.5 text-sm font-medium text-neutral-700 transition-opacity hover:opacity-80 dark:border-neutral-700 dark:text-neutral-200"
             >
               <svg viewBox="0 0 24 24" aria-hidden="true" className="size-4">
                 <path

@@ -85,7 +85,7 @@ export default function ManageEventCard({ event }: ManageEventCardProps) {
 
         {/* Action buttons — no functionality yet */}
         <div className="mt-auto flex gap-3 pt-1">
-          <EditEventDialog/>
+          <EditEventDialog event={event}/>
           <button
             type="button"
             onClick={() => {

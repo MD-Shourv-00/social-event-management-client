@@ -8,9 +8,10 @@ export default function ToggleThemeBtn() {
 
   return (
     <button
+      className="cursor-pointer"
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >
-      {resolvedTheme === "dark" ? <MoonIcon/> : <SunMediumIcon />}
+      {resolvedTheme === "dark" ? <MoonIcon /> : <SunMediumIcon />}
     </button>
   )
 }

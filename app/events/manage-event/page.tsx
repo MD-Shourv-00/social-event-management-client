@@ -2,22 +2,22 @@ import ManageEventCard from "@/components/ManageEventCard"
 import type { EventFormData } from "@/app/type/type"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
-
+import Link from "next/link"
 
 const ManageEventsPage = async () => {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    })
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
 
-    console.log("session",session)
-// fetch data
+  console.log("session", session)
+  // fetch data
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}`,{
-      cache: 'no-store'
+    `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}`,
+    {
+      cache: "no-store",
     }
   )
-  const eventsData:   EventFormData[] = await res.json() || [];
-
+  const eventsData: EventFormData[] = (await res.json()) || []
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -31,7 +31,16 @@ const ManageEventsPage = async () => {
       </div>
 
       {eventsData.length === 0 ? (
-        <div className="flex justify-center items-center border border-dashed rounded-[10px] text-slate-400 border-slate-400 h-75 text-2xl"> No Event Created </div>  
+        <div className="flex h-75 flex-col items-center justify-center rounded-[10px] border border-dashed border-slate-400 text-2xl text-slate-400">
+          <p>No Event Created</p>
+
+          <Link
+            href="/events/create-event"
+            className="my-2 rounded-lg bg-[#26AE60] px-5 py-2 text-base text-white transition hover:bg-[#076932]"
+          >
+            Create Event
+          </Link>
+        </div>
       ) : (
         <div className="grid grid-cols-3 gap-6 max-lg:grid-cols-2 max-md:grid-cols-1 max-sm:grid-cols-1">
           {eventsData.map((event) => (
