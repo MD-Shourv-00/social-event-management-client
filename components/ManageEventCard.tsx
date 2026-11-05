@@ -4,7 +4,6 @@ import { CalendarIcon, MapPinIcon } from "lucide-react"
 import type { EventFormData } from "@/app/type/type"
 import toast from "react-hot-toast"
 
-
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -26,11 +25,12 @@ type ManageEventCardProps = {
 }
 
 export default function ManageEventCard({ event }: ManageEventCardProps) {
-  const [open, setOpen] = useState(false);
-  const router = useRouter();
-  const {data: session} = useSession()
-  
+  const [open, setOpen] = useState(false)
+  const router = useRouter()
+  const { data: session } = useSession()
+
   const handleConfirmDelete = async () => {
+    // delete form one collection
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}_${event._id}`,
       {
@@ -39,12 +39,25 @@ export default function ManageEventCard({ event }: ManageEventCardProps) {
     )
 
     const response = await res.json()
-    console.log(response, "after delete")
-    if (response.deletedCount > 0) toast.success("You deleted an Event")
+
+    // delete from another collection
+    const resAfterDelete = await fetch(
+      `http://localhost:5000/joined-event-admin/${session?.user?.email}/${event._id}`,
+      {
+        method: "DELETE",
+      }
+    )
+
+    const responseAfterDelete = await resAfterDelete.json();
+
+    if (response?.deletedCount > 0 || responseAfterDelete?.deletedCount > 0) {
+      toast.success("You deleted an Event");
+    }
 
     setOpen(false);
     router.refresh();
-  } 
+  }
+
   return (
     <article className="flex flex-col overflow-hidden rounded-xl border border-neutral-200 transition-shadow hover:border-[#26AE60] hover:shadow-md dark:border-neutral-800">
       {/* Thumbnail */}
@@ -85,7 +98,7 @@ export default function ManageEventCard({ event }: ManageEventCardProps) {
 
         {/* Action buttons — no functionality yet */}
         <div className="mt-auto flex gap-3 pt-1">
-          <EditEventDialog event={event}/>
+          <EditEventDialog event={event} />
           <button
             type="button"
             onClick={() => {
@@ -99,8 +112,8 @@ export default function ManageEventCard({ event }: ManageEventCardProps) {
       </div>
 
       {/* confirm delete dialog box */}
-      <Dialog open={open} onOpenChange={setOpen} >
-        <DialogContent className="sm:max-w-md bg-gray-200 dark:bg-gray-900">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="bg-gray-200 sm:max-w-md dark:bg-gray-900">
           <DialogHeader>
             <DialogTitle className="text-xl">
               Are you absolutely sure?
@@ -118,7 +131,7 @@ export default function ManageEventCard({ event }: ManageEventCardProps) {
                 <Button
                   variant="outline"
                   type="button"
-                  className="cursor-pointer hover:bg-[#10723a] hover:text-white border-none duration-500"
+                  className="cursor-pointer border-none duration-500 hover:bg-[#10723a] hover:text-white"
                 >
                   Cancel
                 </Button>
@@ -126,7 +139,7 @@ export default function ManageEventCard({ event }: ManageEventCardProps) {
             />
 
             <Button
-              className="cursor-pointer bg-white/90 dark:bg-black font-bold text-red-700 hover:bg-[#d02f1d] hover:text-white duration-500"
+              className="cursor-pointer bg-white/90 font-bold text-red-700 duration-500 hover:bg-[#d02f1d] hover:text-white dark:bg-black"
               type="button"
               onClick={handleConfirmDelete}
             >
@@ -136,7 +149,6 @@ export default function ManageEventCard({ event }: ManageEventCardProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </article>
   )
 }

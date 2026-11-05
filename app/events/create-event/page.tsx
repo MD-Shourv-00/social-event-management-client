@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, type FormEvent } from "react"
+import { useRouter } from "next/navigation"
 import {
   Dialog,
   DialogContent,
@@ -10,7 +11,6 @@ import {
 } from "@/components/ui/dialog"
 import type { EventFormData } from "@/app/type/type"
 import { useSession } from "@/lib/auth-client"
-import { redirect } from "next/navigation"
 import toast from "react-hot-toast"
 
 const eventTypes = [
@@ -28,50 +28,74 @@ export default function CreateEventPage() {
   const [preview, setPreview] = useState<EventFormData | null>(null)
   const [loading, setLoading] = useState(false)
 
-  //user session
+  const router = useRouter()
+
+  // User session
   const { data: session } = useSession()
 
-  // Collects all form data into a plain object, then opens the dialog
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  // Form submission
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const formData = new FormData(event.currentTarget)
     const data = Object.fromEntries(formData.entries()) as EventFormData
 
+    // Description word count validation
+    const wordCount = data.description.trim().split(/\s+/).length
+
+    if (wordCount < 20 || wordCount > 100) {
+      toast.error("Description must contain 20–100 words.")
+      return
+    }
+
     setPreview(data)
     setOpen(true)
   }
 
+  // Confirm and create event
   const handleConfirmBtn = async () => {
-    // post mehtod use
-    setLoading(true)
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(preview),
+    if (!preview || !session?.user?.email) {
+      toast.error("Please login first!")
+      return
+    }
+
+    try {
+      setLoading(true)
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session.user.email}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(preview),
+        }
+      )
+
+      if (!res.ok) {
+        throw new Error("Failed to create event")
       }
-    )
-    setLoading(false)
 
-    const response = await res.json()
-    console.log(response)
+      const response = await res.json()
 
-    if (response.acknowledged) {
-      setOpen(false)
-      toast.success("You Successfully create a new Event!")
-      redirect("/events/manage-event")
-    } else {
-      toast.error("Event Not Created! Try again (: ")
+      if (response.acknowledged) {
+        setOpen(false)
+        toast.success("You successfully created a new event!")
+        router.push("/events/manage-event")
+      } else {
+        toast.error("Event not created! Try again.")
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error("Something went wrong! Please try again.")
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
-      {/* Top-left CTA text */}
       <h1 className="mb-8 text-3xl font-extrabold text-neutral-900 max-sm:text-2xl dark:text-neutral-50">
         Create Event to help people
       </h1>
@@ -79,7 +103,6 @@ export default function CreateEventPage() {
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-5 rounded-xl border border-neutral-200 p-6 dark:border-neutral-800"
-        noValidate
       >
         {/* Title */}
         <div className="flex flex-col gap-1.5">
@@ -89,6 +112,7 @@ export default function CreateEventPage() {
           >
             Title
           </label>
+
           <input
             required
             id="title"
@@ -107,16 +131,22 @@ export default function CreateEventPage() {
           >
             Description
           </label>
+
           <textarea
+            required
             id="description"
             name="description"
             rows={4}
             placeholder="What is this event about?"
             className="resize-y rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 transition outline-none focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
           />
+
+          <p className="text-xs text-neutral-500">
+            Write at least 20 and at most 100 words.
+          </p>
         </div>
 
-        {/* Event type + Thumbnail (2 columns on desktop) */}
+        {/* Event Type + Thumbnail */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <label
@@ -125,7 +155,9 @@ export default function CreateEventPage() {
             >
               Event Type
             </label>
+
             <select
+              required
               id="eventType"
               name="eventType"
               defaultValue=""
@@ -134,6 +166,7 @@ export default function CreateEventPage() {
               <option value="" disabled>
                 Select event type
               </option>
+
               {eventTypes.map((type) => (
                 <option key={type} value={type}>
                   {type}
@@ -149,18 +182,19 @@ export default function CreateEventPage() {
             >
               Thumbnail Image URL
             </label>
+
             <input
               required
               id="thumbnail"
               name="thumbnail"
-              type="url"
+              type="text"
               placeholder="https://example.com/image.jpg"
               className="rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm text-neutral-900 transition outline-none focus:border-[#26AE60] focus:ring-2 focus:ring-[#26AE60]/20 dark:border-neutral-700 dark:text-neutral-100"
             />
           </div>
         </div>
 
-        {/* Location + Event date (2 columns on desktop) */}
+        {/* Location + Event Date */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <label
@@ -169,6 +203,7 @@ export default function CreateEventPage() {
             >
               Location
             </label>
+
             <input
               required
               id="location"
@@ -186,6 +221,7 @@ export default function CreateEventPage() {
             >
               Event Date
             </label>
+
             <input
               required
               id="eventDate"
@@ -196,7 +232,7 @@ export default function CreateEventPage() {
           </div>
         </div>
 
-        {/* Reset + Create buttons */}
+        {/* Reset + Create Buttons */}
         <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:justify-end">
           <button
             type="reset"
@@ -204,6 +240,7 @@ export default function CreateEventPage() {
           >
             Reset
           </button>
+
           <button
             type="submit"
             className="cursor-pointer rounded-lg bg-[#26AE60] px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
@@ -213,13 +250,14 @@ export default function CreateEventPage() {
         </div>
       </form>
 
-      {/* Confirmation dialog showing the collected data */}
+      {/* Confirmation Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="gap-4 bg-white p-5 text-neutral-900 ring-neutral-200 dark:bg-neutral-900 dark:text-neutral-100 dark:ring-neutral-700">
           <DialogHeader className="gap-1.5">
             <DialogTitle className="text-lg font-semibold">
               Confirm Event
             </DialogTitle>
+
             <DialogDescription className="text-neutral-500 dark:text-neutral-400">
               Please review the event details before confirming.
             </DialogDescription>
@@ -231,41 +269,35 @@ export default function CreateEventPage() {
                 <dt className="font-medium text-neutral-500 dark:text-neutral-400">
                   Title
                 </dt>
-                <dd className="text-neutral-900 dark:text-neutral-100">
-                  {preview.title}
-                </dd>
+                <dd>{preview.title}</dd>
               </div>
+
               <div>
                 <dt className="font-medium text-neutral-500 dark:text-neutral-400">
                   Event Date
                 </dt>
-                <dd className="text-neutral-900 dark:text-neutral-100">
-                  {preview.eventDate}
-                </dd>
+                <dd>{preview.eventDate}</dd>
               </div>
+
               <div>
                 <dt className="font-medium text-neutral-500 dark:text-neutral-400">
                   Event Type
                 </dt>
-                <dd className="text-neutral-900 dark:text-neutral-100">
-                  {preview.eventType}
-                </dd>
+                <dd>{preview.eventType}</dd>
               </div>
+
               <div>
                 <dt className="font-medium text-neutral-500 dark:text-neutral-400">
                   Description
                 </dt>
-                <dd className="text-neutral-900 dark:text-neutral-100">
-                  {preview.description}
-                </dd>
+                <dd>{preview.description}</dd>
               </div>
+
               <div>
                 <dt className="font-medium text-neutral-500 dark:text-neutral-400">
                   Location
                 </dt>
-                <dd className="text-neutral-900 dark:text-neutral-100">
-                  {preview.location}
-                </dd>
+                <dd>{preview.location}</dd>
               </div>
             </dl>
           )}
@@ -278,13 +310,14 @@ export default function CreateEventPage() {
             >
               Edit
             </button>
+
             <button
               type="button"
               disabled={loading}
               onClick={handleConfirmBtn}
-              className="cursor-pointer rounded-lg bg-[#26AE60] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="cursor-pointer rounded-lg bg-[#26AE60] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Confirm
+              {loading ? "Creating..." : "Confirm"}
             </button>
           </div>
         </DialogContent>

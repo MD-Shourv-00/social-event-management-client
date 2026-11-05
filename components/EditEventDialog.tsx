@@ -41,10 +41,22 @@ const EditEventDialog = ({ event }: { event: EventFormData}) => {
     // setPreview(data)
     setOpen(true)
 
-    // post mehtod use
+    // patch in every creator's event db
     setLoading(true)
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}`,
+      `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}/${event._id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    )
+
+    // patch db in where user have joined
+    const resAfterPatch = await fetch(
+      `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/joined-event-admin/${session?.user?.email}/${event._id}`,
       {
         method: "PATCH",
         headers: {
@@ -56,9 +68,10 @@ const EditEventDialog = ({ event }: { event: EventFormData}) => {
     setLoading(false)
 
     const response = await res.json()
-    console.log(response, "after update")
 
-    if (response) {
+    const responseAfterPatch = await resAfterPatch.json()
+
+    if (response.modifiedCount > 0 || responseAfterPatch.modifiedCount > 0) {
       setOpen(false)
       toast.success("Event Updated!")
       router.refresh()

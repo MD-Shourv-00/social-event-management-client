@@ -11,6 +11,7 @@ const joinedEvent = async () => {
   })
 
   console.log(session)
+  
   const res = await fetch(
     `http://localhost:5000/joined-event/${session?.user?.email}`
   )

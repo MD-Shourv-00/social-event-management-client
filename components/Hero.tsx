@@ -10,7 +10,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-black/45 dark:bg-black/60" />
 
       <div className="relative z-10 flex flex-col items-center gap-4">
-        <p className="rounded-2xl font-bold px-3 py-2 text-sm text-[#26AE60] uppercase max-sm:text-xs">
+        <p className="rounded-2xl font-bold px-3 py-2 bg-[#2d744b88] text-sm text-[#07ff72] uppercase max-sm:text-xs">
           A trusted platform
         </p>
         <h1 className="text-5xl font-extrabold tracking-tight text-white uppercase max-lg:text-4xl max-sm:text-3xl">

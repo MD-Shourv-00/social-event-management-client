@@ -11,7 +11,7 @@ export default function EventCard({ event }: EventCardProps) {
   return (
     <article className="flex flex-col rounded-3xl border border-neutral-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900 dark:hover:shadow-[#fb80724d]">
       {/* Thumbnail with overlaid title + description */}
-      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl max-lg:aspect-[4/3] max-md:aspect-video">
+      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl max-lg:aspect-[4/3] max-md:aspect-[4/4]">
         <Image
           src={event.thumbnail}
           alt={event.title}

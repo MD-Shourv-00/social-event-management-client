@@ -59,11 +59,11 @@ export default function Navbar() {
               <Popover>
                 <PopoverTrigger className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[#26AE60] focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-neutral-950">
                   <Image
-                    src={user.image || "/random.jpeg" }
+                    src={user.image || "/random.jpeg"}
                     alt={user.name || "User"}
                     width={9}
                     height={9}
-                    className="h-9 cursor-pointer w-9 rounded-full object-cover ring-2 ring-[#26AE60]"
+                    className="h-9 w-9 cursor-pointer rounded-full object-cover ring-2 ring-[#26AE60]"
                   />
                 </PopoverTrigger>
 
