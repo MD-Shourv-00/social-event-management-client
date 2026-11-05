@@ -12,6 +12,7 @@ import type { EventFormData } from "@/app/type/type"
 import { useSession } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
+import { jwtTokenForClient } from "@/lib/jwt-token-get/jwtTokenForClient"
 
 const eventTypes = [
   "Cleanup",
@@ -23,7 +24,7 @@ const eventTypes = [
   "Community Service",
 ]
 
-const EditEventDialog = ({ event }: { event: EventFormData}) => {
+const EditEventDialog = ({ event }: { event: EventFormData }) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -43,40 +44,51 @@ const EditEventDialog = ({ event }: { event: EventFormData}) => {
 
     // patch in every creator's event db
     setLoading(true)
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}/${event._id}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+
+    try {
+      const token = await jwtTokenForClient()
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}/${event._id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        }
+      )
+
+      // patch db in where user have joined
+      const resAfterPatch = await fetch(
+        `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/joined-event-admin/${session?.user?.email}/${event._id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        }
+      )
+
+      const response = await res.json()
+
+      const responseAfterPatch = await resAfterPatch.json()
+
+      if (response.modifiedCount > 0 || responseAfterPatch.modifiedCount > 0) {
+        setOpen(false)
+        toast.success("Event Updated!")
+        router.refresh()
+      } else {
+        toast.error("Failed Event Updated ")
       }
-    )
-
-    // patch db in where user have joined
-    const resAfterPatch = await fetch(
-      `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/joined-event-admin/${session?.user?.email}/${event._id}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      }
-    )
-    setLoading(false)
-
-    const response = await res.json()
-
-    const responseAfterPatch = await resAfterPatch.json()
-
-    if (response.modifiedCount > 0 || responseAfterPatch.modifiedCount > 0) {
-      setOpen(false)
-      toast.success("Event Updated!")
-      router.refresh()
-    } else {
-      toast.error("Failed Event Updated ")
+    } catch (error) {
+      console.error("Failed to update event:", error)
+      toast.error("Failed to update the event. Please try again.")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -230,7 +242,7 @@ const EditEventDialog = ({ event }: { event: EventFormData}) => {
             <button
               type="submit"
               disabled={loading}
-              className=" cursor-pointer rounded-lg bg-[#26AE60] px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="cursor-pointer rounded-lg bg-[#26AE60] px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
               Edit Confirm
             </button>

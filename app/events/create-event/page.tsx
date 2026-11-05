@@ -12,6 +12,7 @@ import {
 import type { EventFormData } from "@/app/type/type"
 import { useSession } from "@/lib/auth-client"
 import toast from "react-hot-toast"
+import { jwtTokenForClient } from "@/lib/jwt-token-get/jwtTokenForClient"
 
 const eventTypes = [
   "Cleanup",
@@ -62,12 +63,15 @@ export default function CreateEventPage() {
     try {
       setLoading(true)
 
+      const token = await jwtTokenForClient()
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session.user.email}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(preview),
         }

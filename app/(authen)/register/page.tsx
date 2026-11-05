@@ -73,36 +73,55 @@ export default function RegisterPage() {
 
     // send data to better auth for sign up
     setLoading(true)
-    const { data: successData, error } = await signUp.email({
-      name: data.name.trim(),
-      email: data.email.trim(),
-      password: data.password.trim(),
-      image: data.photoURL,
-      callbackURL: "/",
-    })
-    setLoading(false)
 
-    console.log(successData)
-    console.log(error)
+    let isRegistered = false
 
-    if (successData?.user) {
-      toast.success("Registration successful!")
+    try {
+      const { data: successData, error } = await signUp.email({
+        name: data.name.trim(),
+        email: data.email.trim(),
+        password: data.password.trim(),
+        image: data.photoURL,
+        callbackURL: "/",
+      })
+
+      console.log(successData)
+      console.log(error)
+
+      if (successData?.user) {
+        isRegistered = true
+        toast.success("Registration successful!")
+      } else {
+        toast.error(`${error?.message}`)
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error("Something went wrong! Please try again.")
+    } finally {
+      setLoading(false)
+    }
+
+    // redirect happens outside try/catch so Next.js can handle it
+    if (isRegistered) {
       redirect("/")
-    } else {
-      toast.error(`${error?.message}`)
     }
   }
 
   const handleGoogleLogin = async () => {
     // Google sign-in will be wired up later
-    const { error } = await signIn.social({
-      provider: "google",
-    })
+    try {
+      const { error } = await signIn.social({
+        provider: "google",
+      })
 
-    if (!error) {
-      toast.success("Sign In with google is successfull!")
-    } else {
-      toast.error(`Sign In with google is not successfull!`)
+      if (!error) {
+        toast.success("Sign In with google is successfull!")
+      } else {
+        toast.error(`Sign In with google is not successfull!`)
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error("Sign In with google is not successfull!")
     }
   }
 

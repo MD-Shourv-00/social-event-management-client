@@ -3,6 +3,8 @@ import EventCard from "@/components/EventCard"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import Link from "next/link"
+import { unstable_rethrow } from "next/navigation"
+import { jwtTokenForServer } from "@/lib/jwt-token-get/jwtTokenForServer"
 
 const joinedEvent = async () => {
   // session
@@ -11,12 +13,27 @@ const joinedEvent = async () => {
   })
 
   console.log(session)
-  
-  const res = await fetch(
-    `http://localhost:5000/joined-event/${session?.user?.email}`
-  )
 
-  const joinedEvent: EventFormData[] = await res.json()
+  let joinedEvent: EventFormData[] = []
+
+  try {
+    const token = await jwtTokenForServer()
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/joined-event/${session?.user?.email}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    )
+
+    const data = await res.json()
+    joinedEvent = Array.isArray(data) ? data : []
+  } catch (error) {
+    unstable_rethrow(error)
+    console.error("Failed to fetch joined events:", error)
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -34,7 +51,7 @@ const joinedEvent = async () => {
 
           <Link
             href="/events/upcoming-events"
-            className="rounded-lg mx-2 bg-[#26AE60] px-5 py-2 text-base text-white transition hover:bg-[#076932]"
+            className="mx-2 rounded-lg bg-[#26AE60] px-5 py-2 text-base text-white transition hover:bg-[#076932]"
           >
             Explore Events
           </Link>

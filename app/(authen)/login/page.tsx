@@ -41,30 +41,49 @@ export default function LoginPage() {
 
     // send data for login
     setLoading(true)
-    const { data: signInData, error } = await signIn.email({
-      email: data.email.trim(),
-      password: data.password.trim(),
-    })
-    setLoading(false)
 
-    if (signInData?.user) {
-      toast.success("Logged in successfully!")
+    let isLoggedIn = false
+
+    try {
+      const { data: signInData, error } = await signIn.email({
+        email: data.email.trim(),
+        password: data.password.trim(),
+      })
+
+      if (signInData?.user) {
+        isLoggedIn = true
+        toast.success("Logged in successfully!")
+      } else {
+        toast.error(`${error?.message}`)
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error("Something went wrong! Please try again.")
+    } finally {
+      setLoading(false)
+    }
+
+    // redirect happens outside try/catch so Next.js can handle it
+    if (isLoggedIn) {
       redirect("/")
-    } else {
-      toast.error(`${error?.message}`)
     }
   }
 
   const handleGoogleLogin = async () => {
     // Google sign-in will be wired up later
-    const { error } = await signIn.social({
-      provider: "google",
-    })
+    try {
+      const { error } = await signIn.social({
+        provider: "google",
+      })
 
-    if (!error) {
-      toast.success("Sign In with google is successfull!")
-    } else {
-      toast.error(`Sign In with google is not successfull!`)
+      if (!error) {
+        toast.success("Sign In with google is successfull!")
+      } else {
+        toast.error(`Sign In with google is not successfull!`)
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error("Sign In with google is not successfull!")
     }
   }
 

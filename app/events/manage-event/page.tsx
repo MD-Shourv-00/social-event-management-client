@@ -3,6 +3,8 @@ import type { EventFormData } from "@/app/type/type"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import Link from "next/link"
+import { unstable_rethrow } from "next/navigation"
+import { jwtTokenForServer } from "@/lib/jwt-token-get/jwtTokenForServer"
 
 const ManageEventsPage = async () => {
   const session = await auth.api.getSession({
@@ -11,13 +13,27 @@ const ManageEventsPage = async () => {
 
   console.log("session", session)
   // fetch data
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}`,
-    {
-      cache: "no-store",
-    }
-  )
-  const eventsData: EventFormData[] = (await res.json()) || []
+  let eventsData: EventFormData[] = []
+
+  try {
+    const token = await jwtTokenForServer()
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}`,
+      {
+        cache: "no-store",
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    )
+
+    const data = await res.json()
+    eventsData = Array.isArray(data) ? data : []
+  } catch (error) {
+    unstable_rethrow(error)
+    console.error("Failed to fetch manage events:", error)
+  }
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">

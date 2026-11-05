@@ -7,6 +7,7 @@ import { useSession } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import { jwtTokenForClient } from "@/lib/jwt-token-get/jwtTokenForClient"
 
 const JoinedEventBtn = ({ eventData }: { eventData: EventFormData }) => {
   const [joinStatus, setJoinStatus] = useState(false)
@@ -22,11 +23,18 @@ const JoinedEventBtn = ({ eventData }: { eventData: EventFormData }) => {
   // 1. Check joined status from MongoDB
   useEffect(() => {
     if (isPending) return
-    
+
     const checkJoinedStatus = async () => {
       try {
+        const token = await jwtTokenForClient()
+
         const res = await fetch(
-          `http://localhost:5000/joined-event/${email}/${eventId}`
+          `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/joined-event/${email}/${eventId}`,
+          {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+          }
         )
 
         if (!res.ok) throw new Error("Failed to check status")
@@ -54,13 +62,19 @@ const JoinedEventBtn = ({ eventData }: { eventData: EventFormData }) => {
     try {
       setActionLoading(true)
 
-      const res = await fetch(`http://localhost:5000/joined-event/${email}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(eventData),
-      })
+      const token = await jwtTokenForClient()
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/joined-event/${email}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(eventData),
+        }
+      )
 
       const response = await res.json()
 
@@ -85,10 +99,15 @@ const JoinedEventBtn = ({ eventData }: { eventData: EventFormData }) => {
     try {
       setActionLoading(true)
 
+      const token = await jwtTokenForClient()
+
       const res = await fetch(
-        `http://localhost:5000/joined-event/${email}/${eventId}`,
+        `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/joined-event/${email}/${eventId}`,
         {
           method: "DELETE",
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
         }
       )
 

@@ -19,6 +19,7 @@ import { useState } from "react"
 import { useSession } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 import EditEventDialog from "./EditEventDialog"
+import { jwtTokenForClient } from "@/lib/jwt-token-get/jwtTokenForClient"
 
 type ManageEventCardProps = {
   event: EventFormData
@@ -30,32 +31,47 @@ export default function ManageEventCard({ event }: ManageEventCardProps) {
   const { data: session } = useSession()
 
   const handleConfirmDelete = async () => {
-    // delete form one collection
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}_${event._id}`,
-      {
-        method: "DELETE",
+    try {
+      const token = await jwtTokenForClient()
+
+      // delete form one collection
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/all-event/${session?.user?.email}_${event._id}`,
+        {
+          method: "DELETE",
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
+      )
+
+      const response = await res.json()
+
+      // delete from another collection
+      const resAfterDelete = await fetch(
+        `${process.env.NEXT_PUBLIC_LOCAL_SERVER_URL}/joined-event-admin/${session?.user?.email}/${event._id}`,
+        {
+          method: "DELETE",
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
+      )
+
+      const responseAfterDelete = await resAfterDelete.json()
+
+      if (response?.deletedCount > 0 || responseAfterDelete?.deletedCount > 0) {
+        toast.success("You deleted an Event")
+      } else {
+        toast.error("Failed to delete the event")
       }
-    )
 
-    const response = await res.json()
-
-    // delete from another collection
-    const resAfterDelete = await fetch(
-      `http://localhost:5000/joined-event-admin/${session?.user?.email}/${event._id}`,
-      {
-        method: "DELETE",
-      }
-    )
-
-    const responseAfterDelete = await resAfterDelete.json();
-
-    if (response?.deletedCount > 0 || responseAfterDelete?.deletedCount > 0) {
-      toast.success("You deleted an Event");
+      setOpen(false)
+      router.refresh()
+    } catch (error) {
+      console.error("Failed to delete event:", error)
+      toast.error("Failed to delete the event. Please try again.")
     }
-
-    setOpen(false);
-    router.refresh();
   }
 
   return (
